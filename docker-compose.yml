@@ -12,8 +12,15 @@ services:
       - postgres:postgres
     expose:
       - 9000
-    env_file:
-      - .env
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - CIPHER_KEY_SALT=${CIPHER_KEY_SALT}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_VOLUME=/tmp/postgres_llmstack
+      - REDIS_VOLUME=/tmp/redis_llmstack
+      - WEAVIATE_VOLUME=/tmp/weaviate_llmstack
+      - LLMSTACK_PORT=${LLMSTACK_PORT}
+      - DEFAULT_OPENAI_API_KEY=${DEFAULT_OPENAI_API_KEY}
     cap_add:
       - SYS_PTRACE
   rqworker:
@@ -29,8 +36,15 @@ services:
     links:
       - redis:redis
       - postgres:postgres
-    env_file:
-      - .env
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - CIPHER_KEY_SALT=${CIPHER_KEY_SALT}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_VOLUME=/tmp/postgres_llmstack
+      - REDIS_VOLUME=/tmp/redis_llmstack
+      - WEAVIATE_VOLUME=/tmp/weaviate_llmstack
+      - LLMSTACK_PORT=${LLMSTACK_PORT}
+      - DEFAULT_OPENAI_API_KEY=${DEFAULT_OPENAI_API_KEY}
   nginx:
     image: ${REGISTRY:-ghcr.io/trypromptly/}llmstack-nginx:latest
     build:
@@ -42,8 +56,15 @@ services:
         - REGISTRY=${REGISTRY:-ghcr.io/trypromptly/}
     ports:
       - ${LLMSTACK_PORT:-3000}:80
-    env_file:
-      - .env
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - CIPHER_KEY_SALT=${CIPHER_KEY_SALT}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_VOLUME=/tmp/postgres_llmstack
+      - REDIS_VOLUME=/tmp/redis_llmstack
+      - WEAVIATE_VOLUME=/tmp/weaviate_llmstack
+      - LLMSTACK_PORT=${LLMSTACK_PORT}
+      - DEFAULT_OPENAI_API_KEY=${DEFAULT_OPENAI_API_KEY}
     depends_on:
       - api
   playwright:
@@ -66,8 +87,15 @@ services:
     restart: unless-stopped
     volumes:
       - ${REDIS_VOLUME}:/data
-    env_file:
-      - .env
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - CIPHER_KEY_SALT=${CIPHER_KEY_SALT}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_VOLUME=/tmp/postgres_llmstack
+      - REDIS_VOLUME=/tmp/redis_llmstack
+      - WEAVIATE_VOLUME=/tmp/weaviate_llmstack
+      - LLMSTACK_PORT=${LLMSTACK_PORT}
+      - DEFAULT_OPENAI_API_KEY=${DEFAULT_OPENAI_API_KEY}
   postgres:
     image: postgres:15.1-alpine
     command: "postgres -c fsync=off -c full_page_writes=off -c synchronous_commit=OFF"
@@ -79,8 +107,14 @@ services:
       PGDATA: /var/lib/postgresql/data/pgdata
       POSTGRES_USER: ${DATABASE_USERNAME:-llmstack}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-llmstack}
-    env_file:
-      - .env
+      - SECRET_KEY=${SECRET_KEY}
+      - CIPHER_KEY_SALT=${CIPHER_KEY_SALT}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_VOLUME=/tmp/postgres_llmstack
+      - REDIS_VOLUME=/tmp/redis_llmstack
+      - WEAVIATE_VOLUME=/tmp/weaviate_llmstack
+      - LLMSTACK_PORT=${LLMSTACK_PORT}
+      - DEFAULT_OPENAI_API_KEY=${DEFAULT_OPENAI_API_KEY}
   weaviate:
     image: semitechnologies/weaviate:1.20.5
     volumes:
@@ -92,5 +126,12 @@ services:
       DEFAULT_VECTORIZER_MODULE: text2vec-openai
       ENABLE_MODULES: text2vec-openai
       CLUSTER_HOSTNAME: "weaviate-node"
-    env_file:
-      - .env
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - CIPHER_KEY_SALT=${CIPHER_KEY_SALT}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_VOLUME=/tmp/postgres_llmstack
+      - REDIS_VOLUME=/tmp/redis_llmstack
+      - WEAVIATE_VOLUME=/tmp/weaviate_llmstack
+      - LLMSTACK_PORT=${LLMSTACK_PORT}
+      - DEFAULT_OPENAI_API_KEY=${DEFAULT_OPENAI_API_KEY}
